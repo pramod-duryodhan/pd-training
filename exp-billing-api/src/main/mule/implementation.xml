@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:validation="http://www.mulesoft.org/schema/mule/validation"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+        http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+        http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd">
+<flow name="process-billing-flow">
+
+    <logger
+        level="INFO"
+        doc:name="Before HTTP Billing Call"
+        message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;  correlationId: vars.correlationId default "",&#10;  payload: payload default ""&#10;}]'/>
+
+    <http:request
+        method="POST"
+        path="${process.apiPath}"
+        config-ref="HTTP_Request_Billing_Exp"
+        doc:name="Post Call to Process API">
+
+
+        <http:headers><![CDATA[#[output application/json
+---
+{
+  "client_id": Mule::p('secure::process.apiClientId'),
+  "client_secret": Mule::p('secure::process.apiClientSecret'),
+  "correlation-id": vars.correlationId,
+  "Content-Type": "application/json"
+}]]]></http:headers>
+
+    </http:request>
+<logger
+        level="INFO"
+        doc:name="After HTTP: Log Payload and Correlation ID"
+        message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;  correlationId: vars.correlationId default "",&#10;  payload: payload default ""&#10;}]'/>
+
+    <error-handler>
+
+
+        <on-error-propagate
+            type="ANY"
+            logException="true"
+            doc:name="500 for Any Process API Error in Billing" enableNotifications="true">
+
+            <ee:transform doc:name="Transform 500 Error Response" doc:id="e29dc5ae-7739-4488-b2a3-992e9bb0b703">
+                <ee:message>
+
+  
+                    <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  status: "Error",
+  timestamp: now() as String { format: "yyyy-MM-dd:HH:mm:ss" },
+  correlationId: vars.correlationId default "",
+  errorCode: "MULE-ERR-500",
+  message: "Internal Server Error",
+  details: error.description default ""
+}
+                    ]]></ee:set-payload>
+
+                </ee:message>
+            </ee:transform>
+				<logger level="ERROR" doc:name="After HTTP: Error Payload and Correlation ID" doc:id="7ffe9fad-4aa6-4281-a80a-4c73caccfd92" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;  correlationId: vars.correlationId default "",&#10;  payload: payload default ""&#10;}]' />
+        </on-error-propagate>
+    </error-handler>
+</flow>
+
+<flow name="process-billing-status-flow" doc:id="4469b16d-4317-46c0-949d-5bdcbb4ddbaf">
+        <logger level="INFO" doc:name="Before HTTP Billing Status Call" doc:id="264cc9a6-82e4-488f-b74e-1dce8f2fe77b" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;  correlationId: vars.correlationId default "",&#10;  payload: payload default ""&#10;}]' />
+		<http:request method="POST"
+                      path="${process.apiPathStatus}"
+                      config-ref="HTTP_Request_Billing_Exp"
+                      doc:name="Call Process API for Status">
+
+<http:headers><![CDATA[#[output application/json
+---
+{
+  "client_id": Mule::p('secure::process.apiClientId'),
+  "client_secret": Mule::p('secure::process.apiClientSecret'),
+  "correlation-id": vars.correlationId,
+  "Content-Type": "application/json"
+}]]]></http:headers>
+       </http:request>
+        <logger level="INFO" doc:name="Log Payload and correlation ID" doc:id="60ec2ea3-e63e-4c47-86d9-866e7b6ea057" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{ &#10;correlationId: vars.correlationId default "",&#10;payload: payload default ""&#10;}]'/>
+
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="500 for Any Process API Error in Status" doc:id="cc5a667c-7ab8-4916-9668-e14ce36632ef" type="ANY">
+				<ee:transform doc:name="Transform 500 Error Response" doc:id="9fe689da-6e58-46df-b89a-34966ad2bb2a" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  status: "Error",
+  timestamp: now() as String { format: "yyyy-MM-dd:HH:mm:ss" },
+  correlationId: vars.correlationId default "",
+  errorCode: "MULE-ERR-500",
+  message: "Internal Server Error",
+  details: error.description default ""
+}
+                    ]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<logger level="ERROR" doc:name="After HTTP: Error Payload and Correlation ID" doc:id="afe775cb-2647-4791-b7eb-46f63e50c074" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{ &#10;correlationId: vars.correlationId default "",&#10;payload: payload default ""&#10;}]' />
+			</on-error-propagate>
+		</error-handler>
+    </flow>
+</mule>

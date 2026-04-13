@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd ">
+    <flow name="exp-billing-api-main">
+        <http:listener config-ref="exp-billing-api-httpListenerConfig" path="${api.path}">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:error-response>
+        </http:listener>
+        <ee:transform doc:name="var:correlationId,tigerBillingRequest" doc:id="15c4006c-340f-44a4-a65b-46f67376cb43">
+            <ee:message />
+            <ee:variables>
+                <ee:set-variable variableName="correlationId"><![CDATA[%dw 2.0
+output application/java
+---
+attributes.headers.'correlation-id' default uuid()]]></ee:set-variable>
+                <ee:set-variable variableName="tigerBillingRequest"><![CDATA[%dw 2.0
+output application/java
+---
+(if (isEmpty(payload)) {} else payload).tigerBillingRequest default ""]]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <apikit:router config-ref="exp-billing-api-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  "status": "Error",
+  "timestamp": now() as String {format: "yyyy-MM-dd:HH:mm:ss"},
+  "correlationId": vars.correlationId ,
+  "tigerBillingRequest": vars.tigerBillingRequest default null,
+  "errorCode": "MULE-ERR-404",
+  "message": "Resource not found",
+  "details": error.description
+}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus"><![CDATA[404]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  "status": "Error",
+  "timestamp": now() as String {format: "yyyy-MM-dd:HH:mm:ss"},
+  "correlationId": vars.correlationId ,
+  "tigerBillingRequest": vars.tigerBillingRequest default null,
+  "errorCode": "MULE-ERR-405",
+  "message": "Method not allowed",
+  "details": error.description
+}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus"><![CDATA[405]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  "status": "Error",
+  "timestamp": now() as String {format: "yyyy-MM-dd:HH:mm:ss"},
+  "correlationId": vars.correlationId,
+  "tigerBillingRequest": vars.tigerBillingRequest default null,
+  "errorCode": "MULE-ERR-406",
+  "message": "Not acceptable",
+  "details": error.description
+}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus"><![CDATA[406]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  "status": "Error",
+  "timestamp": now() as String {format: "yyyy-MM-dd:HH:mm:ss"},
+  "correlationId": vars.correlationId ,
+  "tigerBillingRequest": vars.tigerBillingRequest default null,
+  "errorCode": "MULE-ERR-415",
+  "message": "Unsupported media type",
+  "details": error.description
+}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus"><![CDATA[415]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  "status": "Error",
+  "timestamp": now() as String {format: "yyyy-MM-dd:HH:mm:ss"},
+  "correlationId": vars.correlationId ,
+  "tigerBillingRequest": vars.tigerBillingRequest default null,
+  "errorCode": "MULE-ERR-501",
+  "message": "Not Implemented",
+  "details": error.description
+}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus"><![CDATA[501]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:BAD_REQUEST">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  "status": "Error",
+  "timestamp": now() as String {format: "yyyy-MM-dd:HH:mm:ss"},
+  "correlationId": vars.correlationId ,
+  "tigerBillingRequest": vars.tigerBillingRequest default null,
+  "errorCode": "MULE-ERR-400",
+  "message": "Bad Request",
+  "details": error.description
+}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus"><![CDATA[400]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="post:\itb\billing:application\json:exp-billing-api-config">
+        <flow-ref doc:name="Process API Billing Call with Validation" doc:id="21a5c42d-17b0-4c93-bb79-7549e3e3e456" name="process-billing-flow" />
+        <ee:transform doc:name="Success Response" doc:id="4f3d58a1-c514-455d-8a9c-dc85c6b20679">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+    <flow name="post:\itb\billing\status:application\json:exp-billing-api-config" doc:id="d15c2d5c-dd9a-4b03-a7c5-7c2c592f8529">
+        <flow-ref doc:name="Process API Billing Status Call with Validation" doc:id="8842248f-706d-4512-b761-d5675aa4ea4d" name="process-billing-status-flow" />
+        <ee:transform doc:name="Success Response">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+    <flow name="get:\health:exp-billing-api-config">
+        <logger level="INFO" message="get:\health:exp-billing-api-config" doc:name="Health Check Logger" />
+        <ee:transform doc:name="Success Response" doc:id="4a799bbd-f610-479f-a480-8b41feee71f3">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"Status": "Active",
+	"Name": "Experience Billing API",
+	"Time Stamp": now() as String {format: "yyyy-MM-DD:hh:mm:ss"}
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+</mule>

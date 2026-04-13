@@ -1,0 +1,19 @@
+api:
+  path: "/api/v1/*"
+  timeout: "40000"
+  id: "20683090"
+
+http:
+  #path: "/api/*"
+  host: "localhost"
+  port: "8081"
+  #timeout: "30000"
+
+process:
+    #apiHost: "projectgalaxydev-projectgalaxydev-itb-tiger-automation-srv.cfapps.us10.hana.ondemand.com"
+    apiHost: "prc-billing-mgmt-api-dev-0a8jy2.fi5vfv.gbr-e1.cloudhub.io"
+    #apiHost: "prc-billing-mgmt-api-dev-0a8jy2.m3jzw3-2.deu-c1.cloudhub.io"
+    apiPort: "443"
+    apiPath: "/api/v1/prc/itb/billing"
+    apiPathStatus: "/api/v1/prc/itb/billing/status"
+ 

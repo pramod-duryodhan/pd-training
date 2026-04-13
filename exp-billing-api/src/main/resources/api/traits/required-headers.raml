@@ -1,0 +1,8 @@
+#%RAML 1.0 Trait
+usage: Adds required authentication headers to secured endpoints.
+headers:
+  correlation-id:
+    type: string
+    required: true
+    maxLength: 36
+    example: d8a1c5f4-934d-4a3d-8fb8-29ac9b92cf30

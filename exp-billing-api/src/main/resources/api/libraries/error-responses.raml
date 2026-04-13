@@ -1,0 +1,132 @@
+#%RAML 1.0 Library
+usage: Standardized error response structures for all APIs.
+
+types:
+  ErrorResponse:
+    type: object
+    description: Generic API error response format.
+    properties:
+      status:
+        type: string
+        example: Error
+      timestamp:
+        type: string
+        # Format: "yyyy-MM-dd:HH:mm:ss"
+        pattern: '^\d{4}-\d{2}-\d{2}:\d{2}:\d{2}:\d{2}$'
+        example: "2025-12-12:00:00:00"
+      correlationId:
+        type: string
+        description: Unique ID for tracing the request.
+        example: "0f47c4e2-1b3f-4d88-ae6a-d60e31da2f4c"
+      tigerBillingRequest:
+        type: integer
+        example: 10000000000001
+      errorCode:
+        type: string
+        description: Standardized error code.
+        example: "MULE-ERR-XXX"
+      message:
+        type: string
+        description: Short description of the error.
+        example: "Error Message"
+      details:
+        type: string
+        description: Additional details about the error.
+        example: "Error Message Details" 
+  
+  ErrorResponseOther:
+    type: object
+    description: Mule Platform API error response format.
+    properties:
+      error:
+        type: string
+        example: Mule Platform API Error Message.
+
+  BAD_REQUEST:
+    type: ErrorResponse
+    example:
+      status: "Error"
+      timestamp: "2025-12-12:00:00:00"
+      correlationId: "0f47c4e2-1b3f-4d88-ae6a-d60e31da2f4c"
+      tigerBillingRequest: 10000000000001
+      errorCode: "MULE-ERR-400"
+      message: "Bad Request"
+      details: "Missing required field: tigerBillingRequest"
+
+  NOT_FOUND:
+    type: ErrorResponse
+    example:
+      status: "Error"
+      timestamp: "2025-12-12:00:00:00"
+      correlationId: "0f47c4e2-1b3f-4d88-ae6a-d60e31da2f4c"
+      tigerBillingRequest: 10000000000001
+      errorCode: "MULE-ERR-404"
+      message: "Resource not found"
+      details: "Resource not found"
+  
+  METHOD_NOT_ALLOWED:
+    type: ErrorResponse
+    example:
+      status: "Error"
+      timestamp: "2025-12-12:00:00:00"
+      correlationId: "0f47c4e2-1b3f-4d88-ae6a-d60e31da2f4c"
+      tigerBillingRequest: 10000000000001
+      errorCode: "MULE-ERR-405"
+      message: "Method not allowed"
+      details: "Method not allowed"
+  
+  NOT_ACCEPTABLE:
+    type: ErrorResponse
+    example:
+      status: "Error"
+      timestamp: "2025-12-12:00:00:00"
+      correlationId: "0f47c4e2-1b3f-4d88-ae6a-d60e31da2f4c"
+      tigerBillingRequest: 10000000000001
+      errorCode: "MULE-ERR-406"
+      message: "Not acceptable"
+      details: "Not acceptable"
+  
+  UNSUPPORTED_MEDIA_TYPE:
+    type: ErrorResponse
+    example:
+      status: "Error"
+      timestamp: "2025-12-12:00:00:00"
+      correlationId: "0f47c4e2-1b3f-4d88-ae6a-d60e31da2f4c"
+      tigerBillingRequest: 10000000000001
+      errorCode: "MULE-ERR-415"
+      message: "Unsupported media type"
+      details: "Unsupported media type : json is accepted"
+
+  NOT_IMPLEMENTED:
+    type: ErrorResponse
+    example:
+      status: "Error"
+      timestamp: "2025-12-12:00:00:00"
+      correlationId: "0f47c4e2-1b3f-4d88-ae6a-d60e31da2f4c"
+      tigerBillingRequest: 10000000000001
+      errorCode: "MULE-ERR-501"
+      message: "Not Implemented"
+      details: "Not Implemented"
+    
+
+
+  InternalServerError:
+    type: ErrorResponse
+    example:
+      status: "Error"
+      timestamp: "2025-12-12:00:00:00"
+      correlationId: "0f47c4e2-1b3f-4d88-ae6a-d60e31da2f4c"
+      tigerBillingRequest: 10000000000001
+      errorCode: "MULE-ERR-500"
+      message: "InternalServerError"
+      details: "InternalServerError"
+
+  ServiceUnavailable:
+    type: ErrorResponseOther
+    example:
+      error: "Service Unavailable"
+  
+  Unauthorized:
+    type: ErrorResponseOther
+    example:
+      error: "Unauthorized"

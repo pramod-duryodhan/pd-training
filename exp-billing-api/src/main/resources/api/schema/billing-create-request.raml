@@ -1,0 +1,88 @@
+#%RAML 1.0 DataType
+
+    type: object
+    additionalProperties: false
+    properties:
+      tigerEngagement:
+        type: string
+        required: false
+        example: Amazon-tax
+        maxLength: 48
+      subscribingProject:
+        type: string
+        required: false
+        example: DE01IN010111 
+        maxLength: 24
+      coordinatingCountry:
+        type: string
+        required: true
+        example: UK01
+        maxLength: 4
+      subscribingBillingWBS:
+        type: string
+        required: true
+        example: DE01IN010111.0.1 
+        maxLength: 24
+      billingAmount:
+        type: string
+        required: true
+        example: '1000'
+        maxLength: 15
+      taxAmount:
+        type: string
+        required: true
+        example: '0'
+        maxLength: 15
+      billingCurrency:
+        type: string
+        maxLength: 3
+        required: true
+        example: EUR
+      billingDate:
+        description: # Date in DD.MM.YYY Format
+        type: string
+        #pattern: '^\d{2}\.\d{2}\.\d{4}$'  # Format: DD.MM.YYYY
+        maxLength: 10
+        required: true
+        example: 11.11.2025
+      coordinatingProject:
+        type: string
+        maxLength: 24
+        required : false
+        example: UK01N000012 
+      coordinatingTargetWP:
+        type: string
+        maxLength: 24
+        required : true
+        example: UK01N000012.1.1 
+      serviceDuration:
+        description: # duration in  Format: DD.MM.YYYY-DD.MM.YYYY Format
+        type: string
+        required : false
+        maxLength: 21
+        #pattern: '^\d{2}\.\d{2}\.\d{4}-\d{2}\.\d{2}\.\d{4}$' #Format: DD.MM.YYYY-DD.MM.YYYY
+        example: 01.09.2025-30.09.2025
+      approvalDate:
+      description: # Date in DD.MM.YYY Format
+        type: string
+        #pattern: '^\d{2}\.\d{2}\.\d{4}$' #Format:DD.MM.YYYY
+        maxLength: 10
+        required: false
+        example: 11.11.2025
+      coordinatingOfficeApprover:
+        type: string
+        maxLength: 40
+        required: false
+        example: Name 
+      manualProcessing:
+        type: string
+        enum: [Yes,No] 
+        maxLength: 4
+        required: false
+        example: Yes
+      tigerBillingRequest:
+        type: string
+        required: true
+        example : "10000000000001"
+        maxLength: 15
+        

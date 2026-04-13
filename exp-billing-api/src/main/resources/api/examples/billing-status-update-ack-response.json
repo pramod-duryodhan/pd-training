@@ -1,0 +1,7 @@
+{ 
+"status": "Accepted", 
+"message": "Your billing status update request has been successfully received and is being processed.", 
+"correlationId" : "d8a1c5f4-934d-4a3d-8fb8-29ac9b92cf30", 
+ "timestamp":   "2025-12-31:00:00:00",
+ "tigerBillingRequest":"10000000000001"
+ } 

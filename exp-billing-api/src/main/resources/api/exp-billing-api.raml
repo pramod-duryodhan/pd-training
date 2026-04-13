@@ -1,0 +1,124 @@
+#%RAML 1.0
+title: exp-billing-api
+baseUri: api/v1
+
+uses:
+  errors: /libraries/error-responses.raml
+traits:
+  oauth: !include /traits/oauth-required.raml
+  correlation-id-headers: !include /traits/required-headers.raml
+  client-id: !include /traits/client-auth.raml
+types:
+  billing-request: !include /schema/billing-create-request.raml/
+
+/itb:
+  /billing:
+    post:
+      is: [client-id,correlation-id-headers]
+      description: This will be used for ITB billing creation.
+      body:
+        application/json:
+          example: !include /examples/billing-create-request.json
+          type : !include /schema/billing-create-request.raml
+      responses:
+        202:
+          body:
+            application/json:
+              example: !include /examples/billing-create-ack-response.json
+              type : !include /schema/billing-create-ack-response.raml
+
+        400:
+          body:
+            application/json:
+              type: errors.BAD_REQUEST
+        401:
+            body:
+              application/json:
+                type: errors.Unauthorized
+        404:
+          body:
+            application/json:
+              type: errors.NOT_FOUND
+        405:
+          body:
+            application/json:
+              type: errors.METHOD_NOT_ALLOWED
+
+        406:
+          body:
+            application/json:
+              type: errors.NOT_ACCEPTABLE
+        415:
+          body:
+            application/json:
+              type: errors.UNSUPPORTED_MEDIA_TYPE
+        501:
+          body:
+            application/json:
+              type: errors.NOT_IMPLEMENTED
+        500:
+          body:
+            application/json:
+              type: errors.InternalServerError
+        503:
+            body:
+              application/json:
+                type: errors.ServiceUnavailable
+    /status:
+      post:
+        is: [client-id,correlation-id-headers]
+        description: This will be used for ITB billing status update.
+        body:
+          application/json:
+            example: !include /examples/billing-status-update-request.json
+            type : !include /schema/billing-status-update-request.raml
+        responses:
+          202:
+            body:
+              application/json:
+                example: !include /examples/billing-status-update-ack-response.json
+                type: !include /schema/billing-status-update-ack-response.raml
+
+          400:
+            body:
+              application/json:
+                type: errors.BAD_REQUEST
+          401:
+            body:
+              application/json:
+                type: errors.Unauthorized
+          404:
+            body:
+              application/json:
+                type: errors.NOT_FOUND
+          405:
+            body:
+              application/json:
+                type: errors.METHOD_NOT_ALLOWED
+
+          406:
+            body:
+              application/json:
+                type: errors.NOT_ACCEPTABLE
+          415:
+            body:
+              application/json:
+                type: errors.UNSUPPORTED_MEDIA_TYPE
+          501:
+            body:
+              application/json:
+                type: errors.NOT_IMPLEMENTED
+          500:
+            body:
+              application/json:
+                type: errors.InternalServerError
+          503:
+            body:
+              application/json:
+                type: errors.ServiceUnavailable
+/health:
+  get:  
+    is: [client-id]
+    description: This will be used for API health check 
+    responses:
+      200:

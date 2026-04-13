@@ -1,0 +1,17 @@
+{
+  "tigerEngagement": "Amazon-tax",
+  "subscribingProject": "DE01IN010111",
+  "coordinatingCountry": "UK01",
+  "subscribingBillingWBS": "DE01IN010111.0.1",
+  "billingAmount": "1000",
+  "taxAmount": "0",
+  "billingCurrency": "EUR",
+  "billingDate": "11.11.2025",
+  "coordinatingProject": "UK01N000012",
+  "coordinatingTargetWP": "UK01N000012.1.1",
+  "serviceDuration": "01.09.2025-30.09.2025",
+  "approvalDate": "11.11.2025",
+  "coordinatingOfficeApprover": "Name",
+  "manualProcessing": "Yes",
+  "tigerBillingRequest": "10000000000001"
+}
