@@ -12,8 +12,8 @@
         </http:listener>
         <ee:transform doc:name="var:correlationId,tigerBillingRequest" doc:id="15c4006c-340f-44a4-a65b-46f67376cb43">
             <ee:message />
-            <ee:variables>
 					
+            <ee:variables>
                 <ee:set-variable variableName="correlationId"><![CDATA[%dw 2.0
 output application/java
 ---
